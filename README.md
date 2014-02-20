@@ -1,7 +1,7 @@
-hibiscus.airplus
+hibiscus.barclaystg
 ================
 
-Airplus-Plugin für Hibiscus
+Plugin für Hibiscus um die Informationen bzgl. Tagesgeldkonten bei der Barclaysbank abzurufen
 
 
     This program is free software; you can redistribute it and/or modify
