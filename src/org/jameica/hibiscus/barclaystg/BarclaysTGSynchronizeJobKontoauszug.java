@@ -58,13 +58,13 @@ public class BarclaysTGSynchronizeJobKontoauszug extends SynchronizeJobKontoausz
 		Logger.info("Rufe Umsätze ab für " + backend.getName());
 
 		////////////////
-		String username = konto.getMeta(BarclaysTGSynchronizeBackend.PROP_USERNAME, null);
+		String username = konto.getKundennummer();
 		String password = konto.getMeta(BarclaysTGSynchronizeBackend.PROP_PASSWORD, null);
 		if (username == null || username.length() == 0)
 			throw new ApplicationException(i18n.tr("Bitte geben Sie Ihren Zugangs-Code in den Synchronisationsoptionen ein"));
 
 		if (password == null || password.length() == 0)
-			throw new ApplicationException(i18n.tr("Bitte geben Sie Ihr Passwort in den Synchronisationsoptionen ein"));
+			password = Application.getCallback().askPassword("Barclays Bank");
 
 		Logger.info("username: " + username);
 		////////////////
@@ -122,7 +122,7 @@ public class BarclaysTGSynchronizeJobKontoauszug extends SynchronizeJobKontoausz
 		@SuppressWarnings("unchecked")
 		List<HtmlTable> kontentabellen = (List<HtmlTable>) page.getByXPath( "//table[@id='konten']");
 		if (kontentabellen.size() != 1) {
-			throw new ApplicationException(i18n.tr("Konnte die Kontenübersicht nicht finden."));
+			throw new ApplicationException(i18n.tr("Konnte die Kontenübersicht nicht finden. (Username/Pwd falsch?)"));
 		}
 		HtmlAnchor ahref = null;
 		HtmlTable kontentabelle = kontentabellen.get(0);

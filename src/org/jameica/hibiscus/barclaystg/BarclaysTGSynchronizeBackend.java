@@ -23,7 +23,6 @@ public class BarclaysTGSynchronizeBackend extends AbstractSynchronizeBackend
 {
   private final static I18N i18n = Application.getPluginLoader().getPlugin(Plugin.class).getResources().getI18N();
 
-  final static String PROP_USERNAME = "Code (12-stellig)";
   final static String PROP_PASSWORD = "Passwort";
   
   /**
@@ -63,7 +62,6 @@ public class BarclaysTGSynchronizeBackend extends AbstractSynchronizeBackend
         return null;
       
       List<String> result = new ArrayList<String>();
-      result.add(PROP_USERNAME);
       result.add(PROP_PASSWORD);
       return result;
     }
