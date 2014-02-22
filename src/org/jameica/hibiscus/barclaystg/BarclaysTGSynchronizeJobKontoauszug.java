@@ -1,5 +1,6 @@
 package org.jameica.hibiscus.barclaystg;
 
+import java.rmi.RemoteException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,6 +25,8 @@ import com.gargoylesoftware.htmlunit.html.HtmlTable;
 import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
 
 import de.willuhn.datasource.GenericIterator;
+import de.willuhn.datasource.GenericObject;
+import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.jameica.hbci.Settings;
 import de.willuhn.jameica.hbci.messaging.ImportMessage;
 import de.willuhn.jameica.hbci.messaging.SaldoMessage;
@@ -82,9 +85,13 @@ public class BarclaysTGSynchronizeJobKontoauszug extends SynchronizeJobKontoausz
 				oldest = umsatz.getDatum();
 		}
 
-
+		
 		// Wir holen uns die Umsaetze seit dem letzen Abruf von der Datenbank
-		GenericIterator existing = konto.getUmsaetze(oldest,null);
+		DBIterator existing = konto.getUmsaetze(oldest,null);
+
+		entferneVorgemerkteBuchungen(existing);
+		
+		
 		for (Umsatz umsatz:fetched)
 		{
 			if (existing.contains(umsatz) != null)
@@ -101,6 +108,20 @@ public class BarclaysTGSynchronizeJobKontoauszug extends SynchronizeJobKontoausz
 
 		// Und per Messaging Bescheid geben, dass das Konto einen neuen Saldo hat
 		Application.getMessagingFactory().sendMessage(new SaldoMessage(konto));
+	}
+
+	private void entferneVorgemerkteBuchungen(DBIterator existing)
+			throws RemoteException, ApplicationException {
+		List<Umsatz> ungebuchteUmsaetze = new ArrayList<Umsatz>();
+		while (existing.hasNext()) {
+			Umsatz x = (Umsatz) existing.next();
+			if ((x.getFlags() & Umsatz.FLAG_NOTBOOKED) > 0) {
+				ungebuchteUmsaetze.add(x);
+			}
+		}
+		for (Umsatz u : ungebuchteUmsaetze) {
+			u.delete();
+		}
 	}
 
 	public List<Umsatz> doOneAccount(Konto konto, String username, String password) throws Exception {
@@ -171,12 +192,19 @@ public class BarclaysTGSynchronizeJobKontoauszug extends SynchronizeJobKontoausz
 					String wertstellung = zeile.getCell(1).asText();
 					String datum = zeile.getCell( 0).asText();
 					String verwendungszweck = zeile.getCell(2).asText();
-
 					Umsatz newUmsatz = (Umsatz) Settings.getDBService().createObject(Umsatz.class,null);
+					if (datum.isEmpty()) {
+						// Sonderfall Vorgemerkte Buchungen
+						newUmsatz.setDatum(df.parse(wertstellung));
+						newUmsatz.setValuta(df.parse(wertstellung));
+						newUmsatz.setFlags(Umsatz.FLAG_NOTBOOKED);
+						newUmsatz.setSaldo(0d);
+					} else {
+						newUmsatz.setDatum(df.parse(datum));
+						newUmsatz.setValuta(df.parse(wertstellung));
+					}
 					newUmsatz.setKonto(konto);
 					newUmsatz.setBetrag(string2float(betrag));
-					newUmsatz.setDatum(df.parse(datum));
-					newUmsatz.setValuta(df.parse(wertstellung));
 					newUmsatz.setWeitereVerwendungszwecke(Utils.parse(verwendungszweck));
 					umsaetze.add(newUmsatz);
 					
