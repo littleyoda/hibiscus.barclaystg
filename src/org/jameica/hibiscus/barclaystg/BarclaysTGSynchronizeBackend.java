@@ -106,7 +106,7 @@ public class BarclaysTGSynchronizeBackend extends AbstractSynchronizeBackend
   /**
    * @see de.willuhn.jameica.hbci.synchronize.AbstractSynchronizeBackend#getSynchronizeKonten(de.willuhn.jameica.hbci.rmi.Konto)
    */
-  protected List<Konto> getSynchronizeKonten(Konto k)
+  public List<Konto> getSynchronizeKonten(Konto k)
   {
     List<Konto> list = super.getSynchronizeKonten(k);
     List<Konto> result = new ArrayList<Konto>();
