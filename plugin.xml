@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.willuhn.de/schema/jameica-plugin"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.willuhn.de/schema/jameica-plugin http://www.willuhn.de/schema/jameica-plugin-1.2.xsd"
-        name="hibiscus.barclaystg" version="1.0.4" class="org.jameica.hibiscus.barclaystg.Plugin">
+        name="hibiscus.barclaystg" version="1.0.5" class="org.jameica.hibiscus.barclaystg.Plugin">
 
   <description>Hibiscus-Support für Tagesgeldkonten der Barclays-Bank</description>
   <url>http://www.open4me.de/hibiscus/hibiscus.barclaystg/hibiscus.barclaystg.zip</url>
