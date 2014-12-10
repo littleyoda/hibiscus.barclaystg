@@ -57,8 +57,7 @@ public class BarclaysTGSynchronizeBackend extends AbstractSynchronizeBackend<Bar
     
     try
     {
-      // Nur Offline-Konten.
-      if (konto == null || !konto.hasFlag(Konto.FLAG_OFFLINE) || konto.hasFlag(Konto.FLAG_DISABLED))
+      if (konto == null || konto.hasFlag(Konto.FLAG_DISABLED))
         return null;
       
       List<String> result = new ArrayList<String>();
@@ -84,16 +83,17 @@ public class BarclaysTGSynchronizeBackend extends AbstractSynchronizeBackend<Bar
     
     try
     {
-      // Wir unterstuetzen nur Offline-Konten
-      if (!konto.hasFlag(Konto.FLAG_OFFLINE))
-        return false;
       
       // Checken, ob das ein AirPlus-Konto ist
       // Muss in Hibiscus als "Offline-Konto" angelegt worden sein.
       // Kann man z.Bsp. anhand der BLZ festmachen. Oder irgend ein anderes Merkmal,
       // welches nur bei den AirPlus-Konten in Hibiscus existiert.
-      if ((konto.getBLZ().equals("0000000") || konto.getBLZ().equals("0") )
+  	  System.out.println(konto.getBackendClass()  + " " +  getClass().getName());
+
+      if (((konto.getBLZ().equals("0000000") || konto.getBLZ().equals("0") )
     	  && konto.getUnterkonto().toLowerCase().replace(" ", "").equals("barclaystagesgeld"))
+    	  || (konto.getBackendClass() != null && konto.getBackendClass().equals(getClass().getName())))
+
         return true;
     }
     catch (RemoteException re)
@@ -103,30 +103,6 @@ public class BarclaysTGSynchronizeBackend extends AbstractSynchronizeBackend<Bar
     return false;
   }
   
-  /**
-   * @see de.willuhn.jameica.hbci.synchronize.AbstractSynchronizeBackend#getSynchronizeKonten(de.willuhn.jameica.hbci.rmi.Konto)
-   */
-  public List<Konto> getSynchronizeKonten(Konto k)
-  {
-    List<Konto> list = super.getSynchronizeKonten(k);
-    List<Konto> result = new ArrayList<Konto>();
-    
-    // Wir wollen nur die Offline-Konten haben
-    for (Konto konto:list)
-    {
-      try
-      {
-        if (konto.hasFlag(Konto.FLAG_OFFLINE))
-          result.add(konto);
-      }
-      catch (RemoteException re)
-      {
-        Logger.error("unable to determine flags of konto",re);
-      }
-    }
-    
-    return result;
-  }
 
   /**
    * @see de.willuhn.jameica.hbci.synchronize.SynchronizeBackend#getName()
