@@ -8,7 +8,6 @@ import de.willuhn.annotation.Lifecycle;
 import de.willuhn.annotation.Lifecycle.Type;
 import de.willuhn.jameica.hbci.rmi.Konto;
 import de.willuhn.jameica.hbci.synchronize.AbstractSynchronizeBackend;
-import de.willuhn.jameica.hbci.synchronize.SynchronizeJobProvider;
 import de.willuhn.jameica.hbci.synchronize.jobs.SynchronizeJob;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
@@ -88,7 +87,6 @@ public class BarclaysTGSynchronizeBackend extends AbstractSynchronizeBackend<Bar
       // Muss in Hibiscus als "Offline-Konto" angelegt worden sein.
       // Kann man z.Bsp. anhand der BLZ festmachen. Oder irgend ein anderes Merkmal,
       // welches nur bei den AirPlus-Konten in Hibiscus existiert.
-  	  System.out.println(konto.getBackendClass()  + " " +  getClass().getName());
 
       if (((konto.getBLZ().equals("0000000") || konto.getBLZ().equals("0") )
     	  && konto.getUnterkonto().toLowerCase().replace(" ", "").equals("barclaystagesgeld"))

@@ -68,6 +68,7 @@ public class BarclaysTGSynchronizeJobKontoauszug extends SynchronizeJobKontoausz
 
 		if (password == null || password.length() == 0)
 			password = Application.getCallback().askPassword("Barclays Bank");
+		
 
 		Logger.info("username: " + username);
 		////////////////
@@ -127,12 +128,16 @@ public class BarclaysTGSynchronizeJobKontoauszug extends SynchronizeJobKontoausz
 	public List<Umsatz> doOneAccount(Konto konto, String username, String password) throws Exception {
 		List<Umsatz> umsaetze = new ArrayList<Umsatz>();
 
-		final WebClient webClient = new WebClient(BrowserVersion.INTERNET_EXPLORER_8);
+		final WebClient webClient = new WebClient();
 		webClient.setCssErrorHandler(new SilentCssErrorHandler());
 		webClient.setRefreshHandler(new ThreadedRefreshHandler());
 
 		// Login-Page und Login
 		HtmlPage page = webClient.getPage("https://service.barclays.de/");
+		if (page.getUrl().toString().equals("http://www.barclays.de/wartung.html")) {
+			Application.getCallback().notifyUser("Aufgrund von Wartungsarbeiten ist bei der Barclays Bank z.Z. kein Abruf von Kontoinformationen möglich.");
+			return umsaetze;
+		}
 		HtmlForm form = page.getForms().get(0);
 		((HtmlInput) page.getHtmlElementById("b_usr")).setValueAttribute(username);
 		((HtmlInput) page.getHtmlElementById("b_pwd")).setValueAttribute(password);
@@ -216,7 +221,7 @@ public class BarclaysTGSynchronizeJobKontoauszug extends SynchronizeJobKontoausz
 			System.out.println("Page " + pagenr + " nicht gefunden!");
 
 		}
-		webClient.closeAllWindows();
+		webClient.close();
 		return umsaetze;
 	}
 	
