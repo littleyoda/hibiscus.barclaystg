@@ -128,10 +128,11 @@ public class BarclaysTGSynchronizeJobKontoauszug extends SynchronizeJobKontoausz
 	public List<Umsatz> doOneAccount(Konto konto, String username, String password) throws Exception {
 		List<Umsatz> umsaetze = new ArrayList<Umsatz>();
 
-		final WebClient webClient = new WebClient();
+		final WebClient webClient = new WebClient(BrowserVersion.BEST_SUPPORTED);
 		webClient.setCssErrorHandler(new SilentCssErrorHandler());
-		webClient.setRefreshHandler(new ThreadedRefreshHandler());
-
+		webClient.getOptions().setJavaScriptEnabled(false);
+		webClient.getOptions().setCssEnabled(false);
+		webClient.getOptions().setRedirectEnabled(true);
 		// Login-Page und Login
 		HtmlPage page = webClient.getPage("https://service.barclays.de/");
 		if (page.getUrl().toString().equals("http://www.barclays.de/wartung.html")) {
@@ -146,7 +147,7 @@ public class BarclaysTGSynchronizeJobKontoauszug extends SynchronizeJobKontoausz
 		
 		// Kontostand extrahierne und Umsatzlink suchen
 		@SuppressWarnings("unchecked")
-		List<HtmlTable> kontentabellen = (List<HtmlTable>) page.getByXPath( "//table[@id='konten']");
+		List<HtmlTable> kontentabellen = (List<HtmlTable>) (List<?>)  page.getByXPath( "//table[@id='konten']");
 		if (kontentabellen.size() != 1) {
 			throw new ApplicationException(i18n.tr("Konnte die Kontenübersicht nicht finden. (Username/Pwd falsch?)"));
 		}
@@ -172,7 +173,7 @@ public class BarclaysTGSynchronizeJobKontoauszug extends SynchronizeJobKontoausz
 		HtmlSelect select = (HtmlSelect) page.getElementById("duration_field");
 		select.setSelectedAttribute("360", true);
 		@SuppressWarnings("unchecked")
-		List<HtmlButton> submitButton = (List<HtmlButton>) page.getByXPath( "//button[@value='weiter']");
+		List<HtmlButton> submitButton = (List<HtmlButton>) (List<?>) page.getByXPath( "//button[@value='weiter']");
 		if (submitButton.size() != 1) {
 			throw new ApplicationException(i18n.tr("Konnte den Datumsbereich  nicht ändern!"));
 		}
@@ -183,7 +184,7 @@ public class BarclaysTGSynchronizeJobKontoauszug extends SynchronizeJobKontoausz
 		try {
 			while (true) {
 				@SuppressWarnings("unchecked")
-				List<HtmlTable> tabellen = (List<HtmlTable>) page.getByXPath( "//table[@id='umsaetze']");
+				List<HtmlTable> tabellen = (List<HtmlTable>) (List<?>) page.getByXPath( "//table[@id='umsaetze']");
 				if (tabellen.size() != 1) {
 					throw new ApplicationException(i18n.tr("Konnte die Umsätze aus Tabelle nicht extrahieren."));
 				}
